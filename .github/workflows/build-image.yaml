@@ -1,0 +1,20 @@
+name: Build Smee Client Image
+on:
+  workflow_dispatch:
+  schedule:
+  - cron:  '30 12 * * *'
+  push:
+    branches:
+    - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - env:
+        LOGIN: ${{ secrets.DOCKER_LOGIN }}
+        PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: docker login -u="${LOGIN}" -p="${PASSWORD}" quay.io
+    - run: docker build -t quay.io/aurelias/smee-client:${GItHUB_SHA}
+    - run: docker push quay.io/aurelias/smee-client:${GItHUB_SHA}
+    - run: docker tag quay.io/aurelias/smee-client:${GItHUB_SHA} quay.io/aurelias/smee-client:latest 
+    - run: docker push quay.io/aurelias/smee-client:latest
